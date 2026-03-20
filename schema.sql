@@ -59,4 +59,6 @@ INSERT IGNORE INTO settings (key_name, value) VALUES
     ('telegram_bot_token', ''),
     ('telegram_chat_id', ''),
     ('risk_free_rate', '0.40'),
-    ('poll_interval_minutes', '2');
+    ('poll_interval_minutes', '2'),
+    ('market_open', '11:00'),
+    ('market_close', '17:00');

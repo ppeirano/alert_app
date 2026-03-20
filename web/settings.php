@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'iol_username', 'iol_password',
         'telegram_bot_token', 'telegram_chat_id',
         'risk_free_rate', 'poll_interval_minutes',
+        'market_open', 'market_close',
     ];
     foreach ($fields as $field) {
         if (isset($_POST[$field])) {
@@ -84,6 +85,18 @@ foreach ($rows as $row) {
                     <input type="number" name="poll_interval_minutes" class="form-control"
                            value="<?= htmlspecialchars($settings['poll_interval_minutes'] ?? '2') ?>">
                     <div class="form-text">Cada cuantos minutos consultar precios (requiere reiniciar motor).</div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Apertura Mercado</label>
+                    <input type="time" name="market_open" class="form-control"
+                           value="<?= htmlspecialchars($settings['market_open'] ?? '11:00') ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cierre Mercado</label>
+                    <input type="time" name="market_close" class="form-control"
+                           value="<?= htmlspecialchars($settings['market_close'] ?? '17:00') ?>">
                 </div>
             </div>
         </div>

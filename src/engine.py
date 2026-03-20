@@ -22,11 +22,19 @@ logger = logging.getLogger(__name__)
 
 
 def is_market_hours():
-    """Check if current time is within Argentine market hours (Mon-Fri 11:00-17:00 ART)."""
+    """Check if current time is within configured market hours (Mon-Fri)."""
     now = datetime.now()
     if now.weekday() >= 5:  # Saturday=5, Sunday=6
         return False
-    return 11 <= now.hour < 17
+
+    market_open = get_setting("market_open") or "11:00"
+    market_close = get_setting("market_close") or "17:00"
+
+    open_h, open_m = map(int, market_open.split(":"))
+    close_h, close_m = map(int, market_close.split(":"))
+
+    current = now.hour * 60 + now.minute
+    return (open_h * 60 + open_m) <= current < (close_h * 60 + close_m)
 
 
 def deduplicate_symbols(rules):
