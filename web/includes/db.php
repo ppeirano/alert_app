@@ -6,7 +6,7 @@ function get_db() {
         $port = getenv('DB_PORT') ?: '3306';
         $name = getenv('DB_NAME') ?: 'iol_alerts';
         $user = getenv('DB_USER') ?: 'root';
-        $pass = getenv('DB_PASSWORD') ?: '';
+        $pass = getenv('DB_PASSWORD') ?: 'admin';
 
         $pdo = new PDO(
             "mysql:host=$host;port=$port;dbname=$name;charset=utf8mb4",
