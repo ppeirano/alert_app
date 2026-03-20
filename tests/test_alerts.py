@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from src.alerts import _check_pct_change, _check_abs_change, _check_iv_cross
+from src.alerts import _check_price_level, _check_pct_change, _check_abs_change, _check_iv_cross
 
 
 def _make_rule(**kwargs):
@@ -10,6 +10,35 @@ def _make_rule(**kwargs):
     }
     defaults.update(kwargs)
     return defaults
+
+
+class TestPriceLevel:
+    def test_triggers_above(self):
+        rule = _make_rule(type="price_level", direction="up", threshold=5000)
+        msg = _check_price_level(rule, 5100)
+        assert msg is not None
+        assert "supera" in msg
+
+    def test_triggers_below(self):
+        rule = _make_rule(type="price_level", direction="down", threshold=5000)
+        msg = _check_price_level(rule, 4900)
+        assert msg is not None
+        assert "perfora" in msg
+
+    def test_no_trigger_above(self):
+        rule = _make_rule(type="price_level", direction="up", threshold=5000)
+        msg = _check_price_level(rule, 4900)
+        assert msg is None
+
+    def test_no_trigger_below(self):
+        rule = _make_rule(type="price_level", direction="down", threshold=5000)
+        msg = _check_price_level(rule, 5100)
+        assert msg is None
+
+    def test_exact_price_triggers(self):
+        rule = _make_rule(type="price_level", direction="up", threshold=5000)
+        msg = _check_price_level(rule, 5000)
+        assert msg is not None
 
 
 class TestPctChange:

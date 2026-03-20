@@ -44,6 +44,7 @@ $logs = $stmt->fetchAll();
                         <td>
                             <?php
                             $types = [
+                                'price_level' => '<span class="badge bg-success">Nivel</span>',
                                 'price_pct_change' => '<span class="badge bg-primary">%</span>',
                                 'price_abs_change' => '<span class="badge bg-info">$</span>',
                                 'iv_threshold' => '<span class="badge bg-warning text-dark">IV</span>',

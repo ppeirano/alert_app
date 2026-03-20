@@ -106,6 +106,7 @@ $rules = $db->query("SELECT * FROM alert_rules ORDER BY created_at DESC")->fetch
                 <div class="col-md-4">
                     <label class="form-label">Tipo</label>
                     <select name="type" class="form-select" id="alertType" required>
+                        <option value="price_level" <?= ($edit_rule['type'] ?? '') === 'price_level' ? 'selected' : '' ?>>Nivel de Precio</option>
                         <option value="price_pct_change" <?= ($edit_rule['type'] ?? '') === 'price_pct_change' ? 'selected' : '' ?>>Cambio Porcentual</option>
                         <option value="price_abs_change" <?= ($edit_rule['type'] ?? '') === 'price_abs_change' ? 'selected' : '' ?>>Cambio Absoluto</option>
                         <option value="iv_threshold" <?= ($edit_rule['type'] ?? '') === 'iv_threshold' ? 'selected' : '' ?>>Volatilidad Implicita</option>
@@ -130,14 +131,14 @@ $rules = $db->query("SELECT * FROM alert_rules ORDER BY created_at DESC")->fetch
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Direccion</label>
-                    <select name="direction" class="form-select">
+                    <select name="direction" class="form-select" id="alertDirection">
                         <option value="any" <?= ($edit_rule['direction'] ?? 'any') === 'any' ? 'selected' : '' ?>>Cualquiera</option>
-                        <option value="up" <?= ($edit_rule['direction'] ?? '') === 'up' ? 'selected' : '' ?>>Sube</option>
-                        <option value="down" <?= ($edit_rule['direction'] ?? '') === 'down' ? 'selected' : '' ?>>Baja</option>
+                        <option value="up" <?= ($edit_rule['direction'] ?? '') === 'up' ? 'selected' : '' ?>>Sube / Supera</option>
+                        <option value="down" <?= ($edit_rule['direction'] ?? '') === 'down' ? 'selected' : '' ?>>Baja / Perfora</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Threshold</label>
+                    <label class="form-label" id="thresholdLabel">Threshold</label>
                     <input type="number" name="threshold" class="form-control" step="0.01" required
                            value="<?= $edit_rule['threshold'] ?? '' ?>">
                 </div>
@@ -230,6 +231,7 @@ $rules = $db->query("SELECT * FROM alert_rules ORDER BY created_at DESC")->fetch
                     <td>
                         <?php
                         $types = [
+                            'price_level' => 'Nivel $',
                             'price_pct_change' => 'Cambio %',
                             'price_abs_change' => 'Cambio $',
                             'iv_threshold' => 'IV',
@@ -264,12 +266,20 @@ $rules = $db->query("SELECT * FROM alert_rules ORDER BY created_at DESC")->fetch
 </div>
 
 <script>
-function toggleIvFields() {
+function updateFormFields() {
     const type = document.getElementById('alertType').value;
     document.getElementById('ivFields').style.display = type === 'iv_threshold' ? 'block' : 'none';
+
+    const labels = {
+        'price_level': 'Precio Objetivo',
+        'price_pct_change': 'Threshold (%)',
+        'price_abs_change': 'Threshold ($)',
+        'iv_threshold': 'Threshold (IV)',
+    };
+    document.getElementById('thresholdLabel').textContent = labels[type] || 'Threshold';
 }
-document.getElementById('alertType').addEventListener('change', toggleIvFields);
-toggleIvFields();
+document.getElementById('alertType').addEventListener('change', updateFormFields);
+updateFormFields();
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

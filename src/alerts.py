@@ -34,7 +34,9 @@ def evaluate_rules(rules, quotes, ivs=None):
 
         msg = None
 
-        if rule["type"] == "price_pct_change":
+        if rule["type"] == "price_level":
+            msg = _check_price_level(rule, current_price)
+        elif rule["type"] == "price_pct_change":
             msg = _check_pct_change(rule, current_price, quote)
         elif rule["type"] == "price_abs_change":
             msg = _check_abs_change(rule, current_price, quote)
@@ -57,6 +59,34 @@ def _cooldown_ok(rule):
         return True
     cooldown = timedelta(minutes=rule.get("cooldown_minutes", 60))
     return datetime.now() - last_alert >= cooldown
+
+
+def _check_price_level(rule, current_price):
+    """Check if price crossed a specific level."""
+    threshold = float(rule["threshold"])
+    direction = rule.get("direction", "any")
+
+    fired = False
+    if direction == "up" and current_price >= threshold:
+        fired = True
+    elif direction == "down" and current_price <= threshold:
+        fired = True
+    elif direction == "any" and (current_price >= threshold or current_price <= threshold):
+        fired = True
+
+    if fired:
+        if current_price >= threshold:
+            arrow = "🔔"
+            label = "supera"
+        else:
+            arrow = "🔔"
+            label = "perfora"
+        return (
+            f"{arrow} *{rule['symbol']}* {label} ${threshold:,.2f}\n"
+            f"Precio: ${current_price:,.2f}\n"
+            f"Regla: {rule['name']}"
+        )
+    return None
 
 
 def _check_pct_change(rule, current_price, quote):
