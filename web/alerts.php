@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'threshold' => floatval($_POST['threshold'] ?? 0),
             'underlying' => strtoupper(trim($_POST['underlying'] ?? '')) ?: null,
             'option_type' => $_POST['option_type'] ?? null,
-            'strike' => $_POST['strike'] ? floatval($_POST['strike']) : null,
-            'expiry' => $_POST['expiry'] ?? null,
+            'strike' => !empty($_POST['strike']) ? floatval($_POST['strike']) : null,
+            'expiry' => !empty($_POST['expiry']) ? $_POST['expiry'] : null,
             'condition' => $_POST['condition_field'] ?? null,
             'cooldown_minutes' => intval($_POST['cooldown_minutes'] ?? 60),
         ];
