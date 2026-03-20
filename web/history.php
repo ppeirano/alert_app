@@ -20,9 +20,9 @@ if ($selected_symbol) {
     $stmt = $db->prepare(
         "SELECT * FROM price_history
          WHERE symbol = ? AND timestamp >= ? AND timestamp <= CONCAT(?, ' 23:59:59')
-         ORDER BY timestamp DESC LIMIT ?"
+         ORDER BY timestamp DESC LIMIT " . $limit
     );
-    $stmt->execute([$selected_symbol, $date_from, $date_to, $limit]);
+    $stmt->execute([$selected_symbol, $date_from, $date_to]);
     $history = $stmt->fetchAll();
 }
 ?>
