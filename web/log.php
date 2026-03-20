@@ -6,13 +6,12 @@ require_once 'includes/header.php';
 $db = get_db();
 $limit = intval($_GET['limit'] ?? 100);
 
-$stmt = $db->prepare(
+$stmt = $db->query(
     "SELECT al.*, ar.name as rule_name, ar.symbol, ar.type as rule_type
      FROM alert_log al
      JOIN alert_rules ar ON al.rule_id = ar.id
-     ORDER BY al.sent_at DESC LIMIT ?"
+     ORDER BY al.sent_at DESC LIMIT $limit"
 );
-$stmt->execute([$limit]);
 $logs = $stmt->fetchAll();
 ?>
 
