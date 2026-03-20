@@ -5,7 +5,7 @@ USE iol_alerts;
 CREATE TABLE IF NOT EXISTS alert_rules (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    type ENUM('price_pct_change', 'price_abs_change', 'iv_threshold') NOT NULL,
+    type ENUM('price_level', 'price_pct_change', 'price_abs_change', 'iv_threshold') NOT NULL,
     symbol VARCHAR(20) NOT NULL,
     mercado VARCHAR(10) DEFAULT 'bCBA',
     direction VARCHAR(10) DEFAULT 'any',
