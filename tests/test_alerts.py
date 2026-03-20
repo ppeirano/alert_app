@@ -15,47 +15,48 @@ def _make_rule(**kwargs):
 class TestPctChange:
     def test_triggers_on_drop(self):
         rule = _make_rule(direction="down", threshold=5.0)
-        prev = {"precio": 100.0}
-        msg = _check_pct_change(rule, 94.0, prev)
+        quote = {"cierreAnterior": 100.0}
+        msg = _check_pct_change(rule, 94.0, quote)
         assert msg is not None
         assert "-6.00%" in msg
 
     def test_no_trigger_below_threshold(self):
         rule = _make_rule(direction="any", threshold=5.0)
-        prev = {"precio": 100.0}
-        msg = _check_pct_change(rule, 97.0, prev)
+        quote = {"cierreAnterior": 100.0}
+        msg = _check_pct_change(rule, 97.0, quote)
         assert msg is None
 
     def test_triggers_on_rise(self):
         rule = _make_rule(direction="up", threshold=3.0)
-        prev = {"precio": 100.0}
-        msg = _check_pct_change(rule, 104.0, prev)
+        quote = {"cierreAnterior": 100.0}
+        msg = _check_pct_change(rule, 104.0, quote)
         assert msg is not None
 
     def test_direction_filter(self):
         rule = _make_rule(direction="up", threshold=5.0)
-        prev = {"precio": 100.0}
+        quote = {"cierreAnterior": 100.0}
         # Price dropped 6% but rule is "up" only
-        msg = _check_pct_change(rule, 94.0, prev)
+        msg = _check_pct_change(rule, 94.0, quote)
         assert msg is None
 
-    def test_no_prev_price(self):
+    def test_no_prev_close(self):
         rule = _make_rule()
-        msg = _check_pct_change(rule, 100.0, None)
+        quote = {}
+        msg = _check_pct_change(rule, 100.0, quote)
         assert msg is None
 
 
 class TestAbsChange:
     def test_triggers_on_rise(self):
         rule = _make_rule(type="price_abs_change", direction="up", threshold=500)
-        prev = {"precio": 1000.0}
-        msg = _check_abs_change(rule, 1600.0, prev)
+        quote = {"cierreAnterior": 1000.0}
+        msg = _check_abs_change(rule, 1600.0, quote)
         assert msg is not None
 
     def test_no_trigger(self):
         rule = _make_rule(type="price_abs_change", direction="any", threshold=500)
-        prev = {"precio": 1000.0}
-        msg = _check_abs_change(rule, 1200.0, prev)
+        quote = {"cierreAnterior": 1000.0}
+        msg = _check_abs_change(rule, 1200.0, quote)
         assert msg is None
 
 

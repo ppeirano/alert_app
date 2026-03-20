@@ -32,15 +32,15 @@ def evaluate_rules(rules, quotes, ivs=None):
         if current_price is None:
             continue
 
-        prev = get_last_price(rule["symbol"])
         msg = None
 
         if rule["type"] == "price_pct_change":
-            msg = _check_pct_change(rule, current_price, prev)
+            msg = _check_pct_change(rule, current_price, quote)
         elif rule["type"] == "price_abs_change":
-            msg = _check_abs_change(rule, current_price, prev)
+            msg = _check_abs_change(rule, current_price, quote)
         elif rule["type"] == "iv_threshold":
             current_iv = ivs.get(rule["symbol"])
+            prev = get_last_price(rule["symbol"])
             prev_iv = prev.get("iv") if prev else None
             msg = _check_iv_cross(rule, current_iv, prev_iv)
 
@@ -59,16 +59,14 @@ def _cooldown_ok(rule):
     return datetime.now() - last_alert >= cooldown
 
 
-def _check_pct_change(rule, current_price, prev):
-    """Check percentage change alert."""
-    if prev is None or prev.get("precio") is None:
+def _check_pct_change(rule, current_price, quote):
+    """Check percentage change vs previous day close."""
+    prev_close = quote.get("cierreAnterior")
+    if prev_close is None or float(prev_close) == 0:
         return None
 
-    prev_price = float(prev["precio"])
-    if prev_price == 0:
-        return None
-
-    pct = ((current_price - prev_price) / prev_price) * 100
+    prev_close = float(prev_close)
+    pct = ((current_price - prev_close) / prev_close) * 100
     threshold = float(rule["threshold"])
     direction = rule.get("direction", "any")
 
@@ -84,19 +82,20 @@ def _check_pct_change(rule, current_price, prev):
         arrow = "📉" if pct < 0 else "📈"
         return (
             f"{arrow} *{rule['symbol']}* {pct:+.2f}%\n"
-            f"Precio: ${current_price:,.2f} (anterior: ${prev_price:,.2f})\n"
+            f"Precio: ${current_price:,.2f} (cierre ant: ${prev_close:,.2f})\n"
             f"Regla: {rule['name']}"
         )
     return None
 
 
-def _check_abs_change(rule, current_price, prev):
-    """Check absolute change alert."""
-    if prev is None or prev.get("precio") is None:
+def _check_abs_change(rule, current_price, quote):
+    """Check absolute change vs previous day close."""
+    prev_close = quote.get("cierreAnterior")
+    if prev_close is None:
         return None
 
-    prev_price = float(prev["precio"])
-    diff = current_price - prev_price
+    prev_close = float(prev_close)
+    diff = current_price - prev_close
     threshold = float(rule["threshold"])
     direction = rule.get("direction", "any")
 
@@ -112,7 +111,7 @@ def _check_abs_change(rule, current_price, prev):
         arrow = "📉" if diff < 0 else "📈"
         return (
             f"{arrow} *{rule['symbol']}* {diff:+,.2f}\n"
-            f"Precio: ${current_price:,.2f} (anterior: ${prev_price:,.2f})\n"
+            f"Precio: ${current_price:,.2f} (cierre ant: ${prev_close:,.2f})\n"
             f"Regla: {rule['name']}"
         )
     return None
